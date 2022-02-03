@@ -119,7 +119,26 @@ console.log(`Average price : ${price_average}`);
 // 2. Log the variable
 // 3. Log the number of products by brands
 
+const brands = {}
+var clone = []
+marketplace.forEach(x => {
+  if(x['brand'] in brands){
+      clone = x['brand'];
+      delete x['brand'];
+      brands[clone].push(x);
+  }else{
+    clone = x['brand'];
+    delete x['brand'];
+    brands[clone] = [x]}});
 
+console.log('brands variable')
+console.log(brands);
+console.log('number of product by brand')
+var le = []
+for(const elmt in brands){
+  le.push(brands[elmt].length)
+}
+console.log(le)
 // 🎯 TODO: Sort by price for each brand
 // 1. For each brand, sort the products by price, from highest to lowest
 // 2. Log the sort
