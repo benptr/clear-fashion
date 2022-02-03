@@ -123,9 +123,9 @@ const brands = {}
 var clone = []
 marketplace.forEach(x => {
   if(x['brand'] in brands){
-      clone = x['brand'];
-      delete x['brand'];
-      brands[clone].push(x);
+    clone = x['brand'];
+    delete x['brand'];
+    brands[clone].push(x);
   }else{
     clone = x['brand'];
     delete x['brand'];
@@ -142,13 +142,27 @@ console.log(le)
 // 🎯 TODO: Sort by price for each brand
 // 1. For each brand, sort the products by price, from highest to lowest
 // 2. Log the sort
-
+//const brand_sort = [...brands]
+var sortprice2 = (a,b) => {return parseInt(b.price)-parseInt(a.price)};
+const brand_sort = {}
+Object.assign(brand_sort, brands);
+for(const elmt in brand_sort){
+  brand_sort[elmt].sort(sortprice2);
+}
+console.log('sort by price for each brand')
+console.log(brand_sort);
 
 // 🎯 TODO: Sort by date for each brand
 // 1. For each brand, sort the products by date, from old to recent
 // 2. Log the sort
-
-
+console.log('sort by date for each brand')
+var sortdate2 = (a,b) => {return Date.parse(b.date) - Date.parse(a.date)};
+const brand_sort2 = {}
+Object.assign(brand_sort2, brands);
+for(const elmt in brand_sort2){
+  brand_sort2[elmt].sort(sortdate2);
+}
+console.log(brand_sort2);
 
 
 
@@ -163,7 +177,16 @@ console.log(le)
 // 1. Compute the p90 price value of each brand
 // The p90 value (90th percentile) is the lower value expected to be exceeded in 90% of the products
 
+console.log('Compute the p90 price value')
+var p90 = []
+var p90_ = []
 
+const reducer2 = (previousValue, currentValue) => previousValue.price + currentValue.price;
+for(const elmt in brand_sort){
+  console.log(brand_sort[elmt][~~(brand_sort[elmt].length*0.90)].price)
+
+}
+console.log(p90)
 
 
 
