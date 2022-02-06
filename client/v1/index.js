@@ -142,10 +142,10 @@ console.log(le)
 // 🎯 TODO: Sort by price for each brand
 // 1. For each brand, sort the products by price, from highest to lowest
 // 2. Log the sort
-//const brand_sort = [...brands]
+console.log('sort by price for each brand')
+let brand_sort = JSON.parse(JSON.stringify(brands));
+//var brand_sort = Object.assign({}, brands);
 var sortprice2 = (a,b) => {return parseInt(b.price)-parseInt(a.price)};
-const brand_sort = {}
-Object.assign(brand_sort, brands);
 for(const elmt in brand_sort){
   brand_sort[elmt].sort(sortprice2);
 }
@@ -155,10 +155,10 @@ console.log(brand_sort);
 // 🎯 TODO: Sort by date for each brand
 // 1. For each brand, sort the products by date, from old to recent
 // 2. Log the sort
+
 console.log('sort by date for each brand')
-var sortdate2 = (a,b) => {return Date.parse(b.date) - Date.parse(a.date)};
-const brand_sort2 = {}
-Object.assign(brand_sort2, brands);
+var sortdate2 = (a,b) => {return Date.parse(a.date) - Date.parse(b.date)};
+let brand_sort2 = JSON.parse(JSON.stringify(brands));
 for(const elmt in brand_sort2){
   brand_sort2[elmt].sort(sortdate2);
 }
@@ -181,10 +181,8 @@ console.log('Compute the p90 price value')
 var p90 = []
 var p90_ = []
 
-const reducer2 = (previousValue, currentValue) => previousValue.price + currentValue.price;
 for(const elmt in brand_sort){
   console.log(brand_sort[elmt][~~(brand_sort[elmt].length*0.90)].price)
-
 }
 console.log(p90)
 
