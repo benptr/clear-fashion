@@ -258,23 +258,55 @@ const COTELE_PARIS = [
 
 // 🎯 TODO: New released products
 // // 1. Log if we have new products only (true or false)
-// // A new product is a product `released` less than 2 weeks.
+// // A new product is a product `released` less than 2 weeks ago.
 
-
+var today = new Date();
+var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+var new_ = false
+for(const elmt in COTELE_PARIS){
+  var date2 = new Date(COTELE_PARIS[elmt].released)
+  var diff =today-date2
+  var days = diff/(1000 * 3600 * 24)
+  if(days<15){
+    new_ = true
+    console.log('we have new product !' )
+    break
+  }
+}
+console.log(`we have a new product ? ${new_}` )
 // 🎯 TODO: Reasonable price
 // // 1. Log if coteleparis is a reasonable price shop (true or false)
 // // A reasonable price if all the products are less than 100€
-
+var reasonable = true
+for(const elmt in COTELE_PARIS){
+  if(COTELE_PARIS[elmt].price > 100){
+    reasonable = false
+    break
+  }
+}
+console.log(`we have reasonables prices ? ${reasonable}` )
 
 // 🎯 TODO: Find a specific product
 // 1. Find the product with the uuid `b56c6d88-749a-5b4c-b571-e5b5c6483131`
 // 2. Log the product
-
-
+var prokey = 0
+for(const elmt in COTELE_PARIS){
+  if(COTELE_PARIS[elmt].uuid ==`b56c6d88-749a-5b4c-b571-e5b5c6483131`){
+    prokey = elmt
+  }
+}
+console.log(COTELE_PARIS[prokey])
 // 🎯 TODO: Delete a specific product
 // 1. Delete the product with the uuid `b56c6d88-749a-5b4c-b571-e5b5c6483131`
 // 2. Log the new list of product
+let COTELE_PARIS2 = JSON.parse(JSON.stringify(COTELE_PARIS));
 
+for(const elmt in COTELE_PARIS2){
+  if(COTELE_PARIS2[elmt].uuid ==`b56c6d88-749a-5b4c-b571-e5b5c6483131`){
+    delete COTELE_PARIS2[elmt]
+  }
+}
+console.log(COTELE_PARIS2)
 // 🎯 TODO: Save the favorite product
 let blueJacket = {
   'link': 'https://coteleparis.com/collections/tous-les-produits-cotele/products/la-veste-bleu-roi',
