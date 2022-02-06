@@ -350,3 +350,5 @@ console.log(jacket)
 // 🎯 TODO: Save in localStorage
 // 1. Save MY_FAVORITE_BRANDS in the localStorage
 // 2. log the localStorage
+localStorage.setItem('MY_FAVORITE_BRANDS', jacket);
+console.log(localStorage.getItem('MY_FAVORITE_BRANDS'))
