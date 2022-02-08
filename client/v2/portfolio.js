@@ -4,13 +4,13 @@
 // current products on the page
 let currentProducts = [];
 let currentPagination = {};
-
+let currentProductsBrand = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
-
+const selectBrand = document.querySelector('#brand-select')
 /**
  * Set global value
  * @param {Array} result - products to display
@@ -25,32 +25,57 @@ const setCurrentProducts = ({result, meta}) => {
  * Fetch products from api
  * @param  {Number}  [page=1] - current page to fetch
  * @param  {Number}  [size=12] - size of the page
+* @param  {String} [brand="none"] - brand filter
  * @return {Object}
  */
-const fetchProducts = async (page = 1, size = 12) => {
+const fetchProducts = async (page = 1, size = 12,brand ='none') => {
   try {
-    const response = await fetch(
-      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
-    );
-    const body = await response.json();
-
-    if (body.success !== true) {
-      console.error(body);
-      return {currentProducts, currentPagination};
+    if(brand = 'none'){
+      const response = await fetch(
+        `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
+      );
+      const body = await response.json();
+      if (body.success !== true) {
+        console.error(body);
+        return {currentProducts, currentPagination};
+      }
+  
+      return body.data;
     }
-
-    return body.data;
+    else{
+      var filter_function = (a) => {return (a.brand == brand)};
+      const body = currentProductsBrand['result'].filter(filter_function)
+      return body.data.slice(0,size);
+    }
+    
   } catch (error) {
     console.error(error);
     return {currentProducts, currentPagination};
   }
 };
 
+const fetchProductsBrand = async (page = 1, size = 1000,brand ='none') => {
+  try {
+    const response = await fetch(
+      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
+    );
+    const body = await response.json();
+    if (body.success !== true) {
+      console.error(body);
+      return {currentProducts, currentPagination};
+    }
+    return body.data;
+  } catch (error) {
+    console.error(error);
+    return {currentProducts, currentPagination};
+  }
+};
 /**
  * Render list of products
  * @param  {Array} products
  */
 const renderProducts = products => {
+  console.log(products)
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
   const template = products
@@ -85,6 +110,21 @@ const renderPagination = pagination => {
   selectPage.innerHTML = options;
   selectPage.selectedIndex = currentPage - 1;
 };
+/**
+ * Render page selector
+ * @param  {Object} pagination
+ */
+  const renderBrand = pagination => {
+  const brands_name = [...new Set(currentProducts.map(x=>x['brand']))]
+  brands_name.unshift("none")
+  const options = Array.from(
+    brands_name,
+     x => `<option value="${x}">${x}</option>`
+  ).join('');
+
+  selectBrand.innerHTML = options;
+  selectBrand.selectedIndex = "none";
+};
 
 /**
  * Render page selector
@@ -100,6 +140,7 @@ const render = (products, pagination) => {
   renderProducts(products);
   renderPagination(pagination);
   renderIndicators(pagination);
+  renderBrand(pagination)
 };
 
 /**
@@ -121,9 +162,19 @@ selectPage.addEventListener('change',async (event) =>{
   render(currentProducts, currentPagination);
 
 })
-document.addEventListener('DOMContentLoaded', async () => {
-  const products = await fetchProducts();
 
+document.addEventListener('DOMContentLoaded', async () => {
+  currentProductsBrand = await fetchProductsBrand();
+  const products = await fetchProducts();
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
+});
+
+selectBrand.addEventListener('change', async (event) => {
+  fetchProducts(currentPagination.currentPage, currentProducts.length,event.target.value).then((products)=>{
+    setCurrentProducts(products);
+    render(currentProductsBrand, currentPagination);
+    console.log(products)
+  });
+
 });
