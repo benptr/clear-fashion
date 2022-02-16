@@ -2,16 +2,20 @@
 'use strict';
 
 // current products on the page
+
 let currentProducts = [];
 let currentPagination = {};
 let currentProductsBrand = {};
 let currentProductsBrandRes = {};
+
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
-const selectBrand = document.querySelector('#brand-select')
+const selectBrand = document.querySelector('#brand-select');
+const selectSort = document.querySelector('#sort-select')
+
 /**
  * Set global value
  * @param {Array} result - products to display
@@ -171,10 +175,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   render(currentProducts, currentPagination);
 });
 
+
 selectBrand.addEventListener('change', async (event) => {
   const products = await fetchProducts(currentPagination.currentPage, currentProducts.length,event.target.value)
   currentProducts = products
   render(currentProducts, currentPagination);
+ 
+
+});
+
+selectSort.addEventListener('change', async (event) => {
+  console.log(currentProducts)
+  console.log('target')
+  console.log(event.target.value)
+  if(event.target.value == 'price-asc'){
+    console.log("sort by Price");
+    var sortprice = (a,b) => {return parseInt(a.price)-parseInt(b.price)};
+    const currentProductscp = [...currentProducts];
+    var OrderPrice = currentProductscp.sort(sortprice);
+    render(OrderPrice, currentPagination);
+  }
+  else {
+    render(currentProducts, currentPagination);
+  }
+
  
 
 });
