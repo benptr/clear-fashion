@@ -15,6 +15,7 @@ const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
 const selectBrand = document.querySelector('#brand-select');
 const selectSort = document.querySelector('#sort-select')
+const selectfilter = document.querySelector('#filter-select')
 
 /**
  * Set global value
@@ -184,8 +185,30 @@ selectBrand.addEventListener('change', async (event) => {
 
 });
 
+selectfilter.addEventListener('change', async (event) => {
+  if(event.target.value == 'reasonableP'){
+    var filter_function = (a) => {return (a.price<=50)};
+    const currentProductscp = [...currentProducts];
+    var filterPrice = currentProductscp.filter(filter_function);
+    render(filterPrice, currentPagination);
+  }
+  else if(event.target.value == 'recentlyR'){
+    var today = new Date();
+    var filter_function2 = (a) => {
+      var diff =today-Date.parse(a.released)
+      var days = diff/(1000 * 3600 * 24)
+      return (days<=15)};
+    const currentProductscp = [...currentProducts];
+    var filterDate = currentProductscp.filter(filter_function2);
+    render(filterDate, currentPagination);
+  }
+  else {
+    render(currentProducts, currentPagination);
+  }
+});
+
+
 selectSort.addEventListener('change', async (event) => {
-  console.log(event.target.value)
   if(event.target.value == 'price-asc'){
     var sortprice = (a,b) => {return parseInt(a.price)-parseInt(b.price)};
     const currentProductscp = [...currentProducts];
@@ -213,7 +236,4 @@ selectSort.addEventListener('change', async (event) => {
   else {
     render(currentProducts, currentPagination);
   }
-
- 
-
 });
