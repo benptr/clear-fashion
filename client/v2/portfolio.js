@@ -185,15 +185,30 @@ selectBrand.addEventListener('change', async (event) => {
 });
 
 selectSort.addEventListener('change', async (event) => {
-  console.log(currentProducts)
-  console.log('target')
   console.log(event.target.value)
   if(event.target.value == 'price-asc'){
-    console.log("sort by Price");
     var sortprice = (a,b) => {return parseInt(a.price)-parseInt(b.price)};
     const currentProductscp = [...currentProducts];
     var OrderPrice = currentProductscp.sort(sortprice);
     render(OrderPrice, currentPagination);
+  }
+  else if(event.target.value == 'price-desc'){
+    var sortprice2 = (a,b) => {return parseInt(b.price)-parseInt(a.price)};
+    const currentProductscp = [...currentProducts];
+    var OrderPrice = currentProductscp.sort(sortprice2);
+    render(OrderPrice, currentPagination);
+  }
+  else if(event.target.value == 'date-asc'){
+    var sortDate = (a,b) => {return Date.parse(a.released) - Date.parse(b.released)};
+    const currentProductscp = [...currentProducts];
+    var Orderdate = currentProductscp.sort(sortDate);
+    render(Orderdate, currentPagination);
+  }
+  else if(event.target.value == 'date-desc'){
+    var sortDate = (a,b) => {return Date.parse(b.released) - Date.parse(a.released)};
+    const currentProductscp = [...currentProducts];
+    var Orderdate = currentProductscp.sort(sortDate);
+    render(Orderdate, currentPagination);
   }
   else {
     render(currentProducts, currentPagination);
