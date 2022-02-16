@@ -12,10 +12,17 @@ let currentProductsBrandRes = {};
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
 const sectionProducts = document.querySelector('#products');
-const spanNbProducts = document.querySelector('#nbProducts');
 const selectBrand = document.querySelector('#brand-select');
-const selectSort = document.querySelector('#sort-select')
-const selectfilter = document.querySelector('#filter-select')
+const selectSort = document.querySelector('#sort-select');
+const selectfilter = document.querySelector('#filter-select');
+// instantiate the selectors for insights 
+const spanNbProducts = document.querySelector('#nbProducts');
+const spannbNewProcucts = document.querySelector('#nbNewProcucts');
+const spanP50 = document.querySelector('#p50');
+const spanP90= document.querySelector('#p90');
+const spanP95 = document.querySelector('#p95');
+
+
 
 /**
  * Set global value
@@ -136,8 +143,17 @@ const renderPagination = pagination => {
  */
 const renderIndicators = pagination => {
   const {count} = pagination;
-
   spanNbProducts.innerHTML = count;
+
+  var today = new Date();
+  var filter_function2 = (a) => {
+    var diff =today-Date.parse(a.released)
+    var days = diff/(1000 * 3600 * 24)
+      return (days<=15)};
+    const currentProductscp = [...currentProductsBrandRes];
+    var filterDate = currentProductscp.filter(filter_function2);
+  spannbNewProcucts.innerHTML = filterDate.length
+
 };
 
 const render = (products, pagination) => {
