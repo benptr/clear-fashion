@@ -5,6 +5,7 @@
 let currentProducts = [];
 let currentPagination = {};
 let currentProductsBrand = {};
+let currentProductsBrandRes = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
@@ -30,7 +31,7 @@ const setCurrentProducts = ({result, meta}) => {
  */
 const fetchProducts = async (page = 1, size = 12,brand ='none') => {
   try {
-    if(brand = 'none'){
+    if(brand == 'none'){
       const response = await fetch(
         `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
       );
@@ -39,13 +40,12 @@ const fetchProducts = async (page = 1, size = 12,brand ='none') => {
         console.error(body);
         return {currentProducts, currentPagination};
       }
-  
       return body.data;
     }
     else{
       var filter_function = (a) => {return (a.brand == brand)};
       const body = currentProductsBrand['result'].filter(filter_function)
-      return body.data.slice(0,size);
+      return body.slice(0,size);
     }
     
   } catch (error) {
@@ -75,7 +75,6 @@ const fetchProductsBrand = async (page = 1, size = 1000,brand ='none') => {
  * @param  {Array} products
  */
 const renderProducts = products => {
-  console.log(products)
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
   const template = products
@@ -115,7 +114,7 @@ const renderPagination = pagination => {
  * @param  {Object} pagination
  */
   const renderBrand = pagination => {
-  const brands_name = [...new Set(currentProducts.map(x=>x['brand']))]
+  const brands_name = [...new Set(currentProductsBrandRes.map(x=>x['brand']))]
   brands_name.unshift("none")
   const options = Array.from(
     brands_name,
@@ -165,16 +164,17 @@ selectPage.addEventListener('change',async (event) =>{
 
 document.addEventListener('DOMContentLoaded', async () => {
   currentProductsBrand = await fetchProductsBrand();
+  currentProductsBrandRes = currentProductsBrand.result
+  console.log(currentProductsBrand)
   const products = await fetchProducts();
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
 
 selectBrand.addEventListener('change', async (event) => {
-  fetchProducts(currentPagination.currentPage, currentProducts.length,event.target.value).then((products)=>{
-    setCurrentProducts(products);
-    render(currentProductsBrand, currentPagination);
-    console.log(products)
-  });
+  const products = await fetchProducts(currentPagination.currentPage, currentProducts.length,event.target.value)
+  currentProducts = products
+  render(currentProducts, currentPagination);
+ 
 
 });
