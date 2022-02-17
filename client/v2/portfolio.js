@@ -149,12 +149,25 @@ const renderIndicators = pagination => {
   var filter_function2 = (a) => {
     var diff =today-Date.parse(a.released)
     var days = diff/(1000 * 3600 * 24)
-      return (days<=15)};
-    const currentProductscp = [...currentProductsBrandRes];
-    var filterDate = currentProductscp.filter(filter_function2);
+      return (days<=15)
+    };
+  const currentProductscp = [...currentProductsBrandRes];
+  var filterDate = currentProductscp.filter(filter_function2);
   spannbNewProcucts.innerHTML = filterDate.length
 
-};
+  function pX(nombre) {
+    var pX = 0
+    var sortprice3 = (a,b) => {return parseInt(b.price)-parseInt(a.price)};
+    const currentProductscp = [...currentProductsBrandRes];
+    var OrderPrice = currentProductscp.sort(sortprice3);
+    pX = OrderPrice[~~(OrderPrice.length*(nombre/100))].price
+    return pX;
+  }
+
+  spanP50.innerHTML = pX(50)
+  spanP90.innerHTML = pX(90)
+  spanP95.innerHTML = pX(95)
+}
 
 const render = (products, pagination) => {
   renderProducts(products);
