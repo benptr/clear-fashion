@@ -21,7 +21,7 @@ const spannbNewProcucts = document.querySelector('#nbNewProcucts');
 const spanP50 = document.querySelector('#p50');
 const spanP90= document.querySelector('#p90');
 const spanP95 = document.querySelector('#p95');
-
+const spanLastrelease = document.querySelector('#lastRelease')
 
 
 /**
@@ -167,6 +167,12 @@ const renderIndicators = pagination => {
   spanP50.innerHTML = pX(50)
   spanP90.innerHTML = pX(90)
   spanP95.innerHTML = pX(95)
+
+  var sortDate3 = (a,b) => {return Date.parse(b.released) - Date.parse(a.released)};
+  const currentProductsBrandRes2 = [...currentProductsBrandRes];
+  var Orderdate2 = currentProductsBrandRes2.sort(sortDate3);
+  spanLastrelease.innerHTML = Orderdate2[0].released
+
 }
 
 const render = (products, pagination) => {
