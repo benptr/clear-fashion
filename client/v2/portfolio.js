@@ -7,6 +7,7 @@ let currentProducts = [];
 let currentPagination = {};
 let currentProductsBrand = {};
 let currentProductsBrandRes = {};
+let favoriteProduct = {};
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -15,6 +16,7 @@ const sectionProducts = document.querySelector('#products');
 const selectBrand = document.querySelector('#brand-select');
 const selectSort = document.querySelector('#sort-select');
 const selectfilter = document.querySelector('#filter-select');
+const filterFavorite = document.querySelector('#favorites');
 // instantiate the selectors for insights 
 const spanNbProducts = document.querySelector('#nbProducts');
 const spannbNewProcucts = document.querySelector('#nbNewProcucts');
@@ -91,20 +93,29 @@ const renderProducts = products => {
   const div = document.createElement('div');
   const template = products
     .map(product => {
+      var buttonStyle = "background-color:white; border-color:black";
+      console.log(product.favorite)
+      if (product.favorite){
+        buttonStyle = "background-color:yellow; border-color:orange";
+      }
       return `
       <div class="product" id=${product.uuid}>
         <span>${product.brand}</span>
-        <a href="${product.link}">${product.name}</a>
+        <a href="${product.link}" target="_blank">${product.name}</a>
         <span>${product.price}</span>
+        <button uuid="${product.uuid}" onclick="OnFavoriteClick(this)" type="button" ${buttonStyle}}">⭐</button>
       </div>
     `;
     })
     .join('');
-
+  
+  
   div.innerHTML = template;
+
   fragment.appendChild(div);
   sectionProducts.innerHTML = '<h2>Products</h2>';
   sectionProducts.appendChild(fragment);
+  
 };
 
 /**
@@ -205,7 +216,7 @@ selectPage.addEventListener('change',async (event) =>{
 document.addEventListener('DOMContentLoaded', async () => {
   currentProductsBrand = await fetchProductsBrand();
   currentProductsBrandRes = currentProductsBrand.result
-  console.log(currentProductsBrand)
+  currentProductsBrand['result'].map(obj => obj.favorite = false);
   const products = await fetchProducts();
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -272,3 +283,24 @@ selectSort.addEventListener('change', async (event) => {
     render(currentProducts, currentPagination);
   }
 });
+function filterByFavorite(usedList){
+  return usedList.filter(obj => obj.favorite == true);
+}
+filterFavorite.onchange = function() {
+  if(filterFavorite.checked) {
+    var currentProductscp = currentProducts;
+    if (currentProducts.length == 0){currentProductscp = currentProductsBrand;}
+    var currentProductsfav = filterByFavorite(currentProductscp);
+    render(currentProductsfav, currentPagination);
+  } 
+  else{
+    render(currentProducts, currentPagination);
+  }
+};
+function OnFavoriteClick(elmt){
+  var uuidFavorite = elmt.uuid
+  console.log(currentProductsBrand)
+  var productFav = currentProductsBrand['result'].find(obj => obj.uuid == uuidFavorite);
+  productFav.favorite = !productFav.favorite;
+  render(currentProducts, currentPagination);
+}
