@@ -5,8 +5,8 @@
 
 let currentProducts = [];
 let currentPagination = {};
-let currentProductsBrand = {};
-let currentProductsBrandRes = {};
+let ProductsSaved = {};
+let ProductsSavedRes = {};
 let favoriteProduct = {};
 
 // instantiate the selectors
@@ -46,19 +46,15 @@ const setCurrentProducts = ({result, meta}) => {
 const fetchProducts = async (page = 1, size = 12,brand ='none') => {
   try {
     if(brand == 'none'){
-      const response = await fetch(
-        `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
-      );
-      const body = await response.json();
-      if (body.success !== true) {
-        console.error(body);
-        return {currentProducts, currentPagination};
-      }
-      return body.data;
+      ProductsSaved['meta'].pageCount = ~~(ProductsSaved['meta'].count/size)+1
+      ProductsSaved['meta'].currentPage=page
+      ProductsSaved['meta'].pageSize = size
+      const body = {"result":ProductsSaved['result'].slice((page-1)*size,(page-1)*size+size),'meta': ProductsSaved['meta']}
+      return body;
     }
     else{
       var filter_function = (a) => {return (a.brand == brand)};
-      const body = currentProductsBrand['result'].filter(filter_function)
+      const body = ProductsSaved['result'].filter(filter_function)
       return body.slice(0,size);
     }
     
@@ -68,7 +64,7 @@ const fetchProducts = async (page = 1, size = 12,brand ='none') => {
   }
 };
 
-const fetchProductsBrand = async (page = 1, size = 1000,brand ='none') => {
+const APIProductsSaved = async (page = 1, size = 1000,brand ='none') => {
   try {
     const response = await fetch(
       `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
@@ -94,7 +90,6 @@ const renderProducts = products => {
   const template = products
     .map(product => {
       var buttonStyle = "background-color:white; border-color:black";
-      console.log(product.favorite)
       if (product.favorite){
         buttonStyle = "background-color:yellow; border-color:orange";
       }
@@ -103,7 +98,7 @@ const renderProducts = products => {
         <span>${product.brand}</span>
         <a href="${product.link}" target="_blank">${product.name}</a>
         <span>${product.price}</span>
-        <button uuid="${product.uuid}" onclick="OnFavoriteClick(this)" type="button" ${buttonStyle}}">⭐</button>
+        <button onclick="OnFavoriteClick(this)" id=${product.uuid} type="button" ${buttonStyle}>⭐</button>
       </div>
     `;
     })
@@ -137,7 +132,7 @@ const renderPagination = pagination => {
  * @param  {Object} pagination
  */
   const renderBrand = pagination => {
-  const brands_name = [...new Set(currentProductsBrandRes.map(x=>x['brand']))]
+  const brands_name = [...new Set(ProductsSavedRes.map(x=>x['brand']))]
   brands_name.unshift("none")
   const options = Array.from(
     brands_name,
@@ -162,14 +157,14 @@ const renderIndicators = pagination => {
     var days = diff/(1000 * 3600 * 24)
       return (days<=15)
     };
-  const currentProductscp = [...currentProductsBrandRes];
+  const currentProductscp = [...ProductsSavedRes];
   var filterDate = currentProductscp.filter(filter_function2);
   spannbNewProcucts.innerHTML = filterDate.length
 
   function pX(nombre) {
     var pX = 0
     var sortprice3 = (a,b) => {return parseInt(b.price)-parseInt(a.price)};
-    const currentProductscp = [...currentProductsBrandRes];
+    const currentProductscp = [...ProductsSavedRes];
     var OrderPrice = currentProductscp.sort(sortprice3);
     pX = OrderPrice[~~(OrderPrice.length*(nombre/100))].price
     return pX;
@@ -180,8 +175,8 @@ const renderIndicators = pagination => {
   spanP95.innerHTML = pX(95)
 
   var sortDate3 = (a,b) => {return Date.parse(b.released) - Date.parse(a.released)};
-  const currentProductsBrandRes2 = [...currentProductsBrandRes];
-  var Orderdate2 = currentProductsBrandRes2.sort(sortDate3);
+  const ProductsSavedRes2 = [...ProductsSavedRes];
+  var Orderdate2 = ProductsSavedRes2.sort(sortDate3);
   spanLastrelease.innerHTML = Orderdate2[0].released
 
 }
@@ -214,9 +209,9 @@ selectPage.addEventListener('change',async (event) =>{
 })
 
 document.addEventListener('DOMContentLoaded', async () => {
-  currentProductsBrand = await fetchProductsBrand();
-  currentProductsBrandRes = currentProductsBrand.result
-  currentProductsBrand['result'].map(obj => obj.favorite = false);
+  ProductsSaved = await APIProductsSaved();
+  ProductsSavedRes = ProductsSaved.result
+  ProductsSaved['result'].map(obj => obj.favorite = false);
   const products = await fetchProducts();
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -289,7 +284,7 @@ function filterByFavorite(usedList){
 filterFavorite.onchange = function() {
   if(filterFavorite.checked) {
     var currentProductscp = currentProducts;
-    if (currentProducts.length == 0){currentProductscp = currentProductsBrand;}
+    if (currentProducts.length == 0){currentProductscp = ProductsSaved;}
     var currentProductsfav = filterByFavorite(currentProductscp);
     render(currentProductsfav, currentPagination);
   } 
@@ -298,9 +293,8 @@ filterFavorite.onchange = function() {
   }
 };
 function OnFavoriteClick(elmt){
-  var uuidFavorite = elmt.uuid
-  console.log(currentProductsBrand)
-  var productFav = currentProductsBrand['result'].find(obj => obj.uuid == uuidFavorite);
+  var uuidFavorite = elmt.id
+  var productFav = ProductsSaved['result'].find(obj => obj.uuid === uuidFavorite);
   productFav.favorite = !productFav.favorite;
   render(currentProducts, currentPagination);
 }
