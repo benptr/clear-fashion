@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
-
+const {'v5': uuidv5} = require('uuid');
 /**
  * Parse webpage e-shop
  * @param  {String} data - html response
@@ -11,20 +11,34 @@ const parse = data => {
 
   return $('.product-container')
     .map((i, element) => {
-      const name = $(element)
-        .find('.product-name:first')
-        .text()
-        .trim()
-      const price = parseInt(
-        $(element)
-          .find('.product-price:first')
+      const link = $(element)
+      .find('.product-image-container a')
+      .attr('href')
+      console.log('mmm')
+      console.log($(element)
+      .find('.product-image-container a')
+      .attr('href'))
+      return {
+        'link' : link,
+        'brand': 'adresse',
+        'price': parseInt(
+          $(element)
+            .find('.content_price')
+            .text()
+        ),
+        'name': $(element)
+          .find('.product-name:first')
           .text()
-      );
-
-      return {name, price};
+          .trim(),
+        'photo': $(element)
+          .find('.product_img_link img')
+          .attr('src'),
+        '_id': uuidv5(link, uuidv5.URL)
+      };
     })
     .get();
 };
+
 
 /**
  * Scrape all the products for a given url page
