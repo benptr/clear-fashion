@@ -98,7 +98,7 @@ const renderProducts = products => {
         <span>${product.brand}</span>
         <a href="${product.link}" target="_blank">${product.name}</a>
         <span>${product.price}</span>
-        <button onclick="OnFavoriteClick(this)" id=${product.uuid} type="button" ${buttonStyle}>⭐</button>
+        <button onclick="OnFavoriteClick(this)" toto="hello" id=${product.uuid} type="button" ${buttonStyle}>⭐</button>
       </div>
     `;
     })
@@ -293,6 +293,7 @@ filterFavorite.onchange = function() {
   }
 };
 function OnFavoriteClick(elmt){
+  console.log(elmt)
   var uuidFavorite = elmt.id
   var productFav = ProductsSaved['result'].find(obj => obj.uuid === uuidFavorite);
   productFav.favorite = !productFav.favorite;

@@ -7,7 +7,7 @@ async function getDedicated (eshop = 'https://www.dedicatedbrand.com/en/men/news
 
     const products = await dedicatedbrand.scrape(eshop);
     listProduct = products
-    console.log(products);
+    console.log(listProduct);
     console.log('done');
     return listProduct
   } catch (e) {
