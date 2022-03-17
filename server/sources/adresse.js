@@ -14,10 +14,6 @@ const parse = data => {
       const link = $(element)
       .find('.product-image-container a')
       .attr('href')
-      console.log('mmm')
-      console.log($(element)
-      .find('.product-image-container a')
-      .attr('href'))
       return {
         'link' : link,
         'brand': 'adresse',

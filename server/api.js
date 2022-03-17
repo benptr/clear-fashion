@@ -1,6 +1,7 @@
 const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
+const mongoApi = require('./MongoApi')
 
 const PORT = 8092;
 
@@ -21,3 +22,20 @@ app.get('/', (request, response) => {
 app.listen(PORT);
 
 console.log(`📡 Running on port ${PORT}`);
+app.get('/products/search', (request, response) => {
+  param = request.query['bon']
+  response.send({'test': param});
+});
+
+
+app.get('/products/:id', async (request, response) => {
+  param = request.params
+  answer = await mongoApi.findId(param)
+  response.send(answer);
+});
+app.get('/products/search', async (request, response) => {
+  param = request.query
+  answer = await mongoApi.search(param)
+  response.send(answer);
+});
+

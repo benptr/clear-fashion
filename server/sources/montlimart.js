@@ -10,33 +10,33 @@ const parse = data => {
   const $ = cheerio.load(data);
 
 
-  return $('.product-info')
+  return $('.item')
   .map((i, element) => {
     const name = $(element)
-    .find('.product-name')
+    .find('.product-info .product-name')
     .text()
     .trim()
     .replace(/\s/g, '-');
-    const link = $('.product-image')
-    .find(' .actions a')
+    const link = $(element)
+    .find('.product-image .actions a')
     .attr('href');
     return {
       link,
       'brand': 'montlimart',
       'price': parseInt(
         $(element)
-          .find('.price')
+          .find('.product-info .price')
           .text()
       ),
       'name': $(element)
-        .find('.product-name')
+        .find('.product-info .product-name')
         .text()
         .trim()
         .replace(/\s/g, ' '),
-      'photo': $('.product-image')
-        .find('img')
+      'photo': $(element)
+        .find('.product-image img')
         .attr('src'),
-      '_id': uuidv5(link, uuidv5.URL)
+      '_id': uuidv5(link??"", uuidv5.URL)
     };
   })
   .get();

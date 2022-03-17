@@ -18,7 +18,15 @@ async function database () {
       let loomPage = ['https://www.loom.fr/collections/vestiaire-homme']
       let montlimartPage = ['https://www.montlimart.com/toute-la-collection.html?col=338&size=136']
       console.log(`🕵️‍♀️  browsing ${dedicatedbrandpages.length} pages with for...of`);
-      
+      for (let page of montlimartPage) {
+        console.log(`🕵️‍♀️  scraping ${page}`);
+  
+        let results = await montlimart.scrape(page);
+  
+        console.log(`👕 ${results.length} products found`);
+  
+        products.push(results);
+      }
       for (let page of dedicatedbrandpages) {
         console.log(`🕵️‍♀️  scraping ${page}`);
   
@@ -46,15 +54,7 @@ async function database () {
   
         products.push(results);
       }
-      for (let page of montlimartPage) {
-        console.log(`🕵️‍♀️  scraping ${page}`);
-  
-        let results = await montlimart.scrape(page);
-  
-        console.log(`👕 ${results.length} products found`);
-  
-        products.push(results);
-      }
+      
       products = products.flat();
   
       console.log(`👕 ${products.length} total of products found`);
