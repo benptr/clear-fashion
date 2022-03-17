@@ -20,7 +20,6 @@ const parse = data => {
     const link = $('.product-image')
     .find(' .actions a')
     .attr('href');
-    console.log("fff")
     return {
       link,
       'brand': 'montlimart',
