@@ -1,4 +1,0 @@
-https://server-chi-ruddy.vercel.app
-https://server-chi-ruddy.vercel.app/products/search?limit=5&brand=loom&price=100
-
-bug : dedicated loom adresse
