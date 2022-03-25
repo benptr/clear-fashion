@@ -1,0 +1,2 @@
+client : https://client-one-azure.vercel.app/
+api : https://server-chi-ruddy.vercel.app/
