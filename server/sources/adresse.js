@@ -28,7 +28,7 @@ const parse = data => {
           .trim(),
         'photo': $(element)
           .find('.product_img_link img')
-          .attr('src'),
+          .attr('data-original'),
         '_id': uuidv5(link, uuidv5.URL)
       };
     })

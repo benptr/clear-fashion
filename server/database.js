@@ -11,7 +11,7 @@ async function database () {
     try {
       let products = [];
       let dedicatedbrandpages = [
-        'https://www.dedicatedbrand.com/en/men/basics',
+        'https://www.dedicatedbrand.com/en/men/news',
         'https://www.dedicatedbrand.com/en/men/sale'
       ];
       let adressePage = ['https://adresse.paris/630-toute-la-collection/s-7/taille-l/couleur-bleu']

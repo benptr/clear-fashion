@@ -87,6 +87,7 @@ const APIProductsSaved = async (page = 1, size = 1000,brand ='none') => {
 const renderProducts = products => {
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
+  console.log(products)
   const template = products
     .map(product => {
       var buttonStyle = "background-color:white; border-color:black";

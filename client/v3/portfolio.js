@@ -1,230 +1,123 @@
 // Invoking strict mode https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode#invoking_strict_mode
 'use strict';
-
-// current products on the page
-
+let favoriteP = []
 let currentProducts = [];
 let currentPagination = {};
-let ProductsSaved = {};
-let ProductsSavedRes = {};
-let favoriteProduct = {};
+const sectionProducts = document.querySelector('.porductlist');
 
-// instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
-const sectionProducts = document.querySelector('#products');
 const selectBrand = document.querySelector('#brand-select');
 const selectSort = document.querySelector('#sort-select');
 const selectfilter = document.querySelector('#filter-select');
 const filterFavorite = document.querySelector('#favorites');
-// instantiate the selectors for insights 
-const spanNbProducts = document.querySelector('#nbProducts');
-const spannbNewProcucts = document.querySelector('#nbNewProcucts');
-const spanP50 = document.querySelector('#p50');
-const spanP90= document.querySelector('#p90');
-const spanP95 = document.querySelector('#p95');
-const spanLastrelease = document.querySelector('#lastRelease')
-
-
-/**
- * Set global value
- * @param {Array} result - products to display
- * @param {Object} meta - pagination meta info
- */
-const setCurrentProducts = ({result, meta}) => {
-  currentProducts = result;
-  currentPagination = meta;
-};
-
-/**
- * Fetch products from api
- * @param  {Number}  [page=1] - current page to fetch
- * @param  {Number}  [size=12] - size of the page
-* @param  {String} [brand="none"] - brand filter
- * @return {Object}
- */
-const fetchProducts = async (page = 1, size = 12,brand ='none') => {
-  try {
-    if(brand == 'none'){
-      ProductsSaved['meta'].pageCount = ~~(ProductsSaved['meta'].count/size)+1
-      ProductsSaved['meta'].currentPage=page
-      ProductsSaved['meta'].pageSize = size
-      const body = {"result":ProductsSaved['result'].slice((page-1)*size,(page-1)*size+size),'meta': ProductsSaved['meta']}
-      return body;
-    }
-    else{
-      var filter_function = (a) => {return (a.brand == brand)};
-      const body = ProductsSaved['result'].filter(filter_function)
-      return body.slice(0,size);
-    }
-    
-  } catch (error) {
-    console.error(error);
-    return {currentProducts, currentPagination};
-  }
-};
-
-const APIProductsSaved = async (page = 1, size = 1000,brand ='none') => {
-  try {
-    const response = await fetch(
-      `https://clear-fashion-api.vercel.app?page=${page}&size=${size}`
-    );
-    const body = await response.json();
-    if (body.success !== true) {
-      console.error(body);
-      return {currentProducts, currentPagination};
-    }
-    return body.data;
-  } catch (error) {
-    console.error(error);
-    return {currentProducts, currentPagination};
-  }
-};
 /**
  * Render list of products
  * @param  {Array} products
  */
-const renderProducts = products => {
+ const renderProducts = products => {
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
+  div.classList.add("row")
   const template = products
     .map(product => {
-      var buttonStyle = "background-color:white; border-color:black";
-      if (product.favorite){
-        buttonStyle = "background-color:yellow; border-color:orange";
-      }
       return `
-      <div class="product" id=${product.uuid}>
-        <span>${product.brand}</span>
-        <a href="${product.link}" target="_blank">${product.name}</a>
-        <span>${product.price}</span>
-        <button onclick="OnFavoriteClick(this)" toto="hello" id=${product.uuid} type="button" ${buttonStyle}>⭐</button>
-      </div>
+      <div class="col-md-6 col-lg-4 col-xl-3">
+      <div id="${product._id}" class="single-product">
+        <div class="part-1" style="background: url('${product.photo}') no-repeat center;background-size: cover;">
+            <ul>
+                <li><a onclick="OnFavoriteClick(this)" id=${product._id}><i class="fas fa-heart"></i></a></li>
+                <li><a href="${product.link}" target="_blank"><i class="fas fa-plus"></i></a></li>
+            </ul>
+        </div>
+        <div class="part-2">
+            <h3 class="product-title">${product.name}</h3>
+            <h4 class="product-brand">${product.brand}</h4>
+            <h5 class="product-price">${product.price} €</h5>
+        </div>
+    </div>
+    </div>
     `;
     })
     .join('');
   
   div.innerHTML = template;
-
+  sectionProducts.innerHTML = ''
   fragment.appendChild(div);
-  sectionProducts.innerHTML = '<h2>Products</h2>';
   sectionProducts.appendChild(fragment);
   
 };
 
-/**
- * Render page selector
- * @param  {Object} pagination
- */
-const renderPagination = pagination => {
-  const {currentPage, pageCount} = pagination;
-  const options = Array.from(
-    {'length': pageCount},
-    (value, index) => `<option value="${index + 1}">${index + 1}</option>`
-  ).join('');
-
-  selectPage.innerHTML = options;
-  selectPage.selectedIndex = currentPage - 1;
-};
-/**
- * Render page selector
- * @param  {Object} pagination
- */
-  const renderBrand = pagination => {
-  const brands_name = [...new Set(ProductsSavedRes.map(x=>x['brand']))]
-  brands_name.unshift("none")
-  const options = Array.from(
-    brands_name,
-     x => `<option value="${x}">${x}</option>`
-  ).join('');
-
-  selectBrand.innerHTML = options;
-  selectBrand.selectedIndex = "none";
-};
-
-/**
- * Render page selector
- * @param  {Object} pagination
- */
-const renderIndicators = pagination => {
-  const {count} = pagination;
-  spanNbProducts.innerHTML = count;
-
-  var today = new Date();
-  var filter_function2 = (a) => {
-    var diff =today-Date.parse(a.released)
-    var days = diff/(1000 * 3600 * 24)
-      return (days<=15)
-    };
-  const currentProductscp = [...ProductsSavedRes];
-  var filterDate = currentProductscp.filter(filter_function2);
-  spannbNewProcucts.innerHTML = filterDate.length
-
-  function pX(nombre) {
-    var pX = 0
-    var sortprice3 = (a,b) => {return parseInt(b.price)-parseInt(a.price)};
-    const currentProductscp = [...ProductsSavedRes];
-    var OrderPrice = currentProductscp.sort(sortprice3);
-    pX = OrderPrice[~~(OrderPrice.length*(nombre/100))].price
-    return pX;
-  }
-
-  spanP50.innerHTML = pX(50)
-  spanP90.innerHTML = pX(90)
-  spanP95.innerHTML = pX(95)
-
-  var sortDate3 = (a,b) => {return Date.parse(b.released) - Date.parse(a.released)};
-  const ProductsSavedRes2 = [...ProductsSavedRes];
-  var Orderdate2 = ProductsSavedRes2.sort(sortDate3);
-  spanLastrelease.innerHTML = Orderdate2[0].released
-
-}
 
 const render = (products, pagination) => {
   renderProducts(products);
-  renderPagination(pagination);
-  renderIndicators(pagination);
-  renderBrand(pagination)
+  currentPagination = pagination
+};
+/**
+ * Set global value
+ * @param {Array} result - products to display
+ * @param {Object} meta - pagination meta info
+ */
+ const setCurrentProductsPagination = ({limit, size,result,brand}) => {
+  currentProducts = result;
+  currentPagination = {limit,size,page,brand};
 };
 
-/**
- * Declaration of all Listeners
- */
+const fetchProducts = async (pager = 0, limit =100,price=1000,brand ='none') => {
+  try {
+    var response = []
+    if( brand!='none'){
+      console.log(`https://server-chi-ruddy.vercel.app/products/search?page=${pager}&limit=${limit}&brand=${brand}&price=${price}`)
+         response = await fetch(
+        `https://server-chi-ruddy.vercel.app/products/search?page=${pager}&limit=${limit}&brand=${brand}&price=${price}`
+      );
+    }
+    else{ response = await fetch(
+      `https://server-chi-ruddy.vercel.app/products/search?page=${pager}&limit=${limit}&price=${price}`
+    );}    
+    console.log(response)
+    const body = await response.json();
+    console.log(body)
+    return body;
+  } catch (error) {
+    console.error(error);
+    return {currentProducts, currentPagination};
+  }
+};
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const products = await fetchProducts(0,12,1000,'none');
+  currentPagination.page=0
+  setCurrentProductsPagination(products);
+  render(currentProducts, currentPagination);
+});
+
 
 /**
  * Select the number of products to display
  */
-selectShow.addEventListener('change', async (event) => {
-  const products = await fetchProducts(currentPagination.currentPage, parseInt(event.target.value));
-  setCurrentProducts(products);
+ selectShow.addEventListener('change', async (event) => {
+  const products = await fetchProducts(currentPagination.page, parseInt(event.target.value),currentPagination.price,currentPagination.brand);
+  currentPagination.size=parseInt(event.target.value)
+  setCurrentProductsPagination(products);
   render(currentProducts, currentPagination);
 });
 selectPage.addEventListener('change',async (event) =>{
-  currentPagination.currentPage = 1;
-  const products = await fetchProducts(parseInt(event.target.value), currentProducts.length);
-  setCurrentProducts(products);
+  const products = await fetchProducts(parseInt(event.target.value),currentPagination.size,currentPagination.price,currentPagination.brand);
+  currentPagination.page=parseInt(event.target.value)
+  setCurrentProductsPagination(products);
   render(currentProducts, currentPagination);
 
 })
 
-document.addEventListener('DOMContentLoaded', async () => {
-  ProductsSaved = await APIProductsSaved();
-  ProductsSavedRes = ProductsSaved.result
-  ProductsSaved['result'].map(obj => obj.favorite = false);
-  const products = await fetchProducts();
-  setCurrentProducts(products);
-  render(currentProducts, currentPagination);
-});
-
 
 selectBrand.addEventListener('change', async (event) => {
-  const products = await fetchProducts(currentPagination.currentPage, currentProducts.length,event.target.value)
-  currentProducts = products
+  const products = await fetchProducts(currentPagination.page, currentPagination.size,currentPagination.price,event.target.value)
+  setCurrentProductsPagination(products);
+  currentPagination.brand = event.target.value
   render(currentProducts, currentPagination);
- 
-
 });
-
 
 selectfilter.addEventListener('change', async (event) => {
   if(event.target.value == 'reasonableP'){
@@ -232,16 +125,6 @@ selectfilter.addEventListener('change', async (event) => {
     const currentProductscp = [...currentProducts];
     var filterPrice = currentProductscp.filter(filter_function);
     render(filterPrice, currentPagination);
-  }
-  else if(event.target.value == 'recentlyR'){
-    var today = new Date();
-    var filter_function2 = (a) => {
-      var diff =today-Date.parse(a.released)
-      var days = diff/(1000 * 3600 * 24)
-      return (days<=15)};
-    const currentProductscp = [...currentProducts];
-    var filterDate = currentProductscp.filter(filter_function2);
-    render(filterDate, currentPagination);
   }
   else {
     render(currentProducts, currentPagination);
@@ -262,18 +145,6 @@ selectSort.addEventListener('change', async (event) => {
     var OrderPrice = currentProductscp.sort(sortprice2);
     render(OrderPrice, currentPagination);
   }
-  else if(event.target.value == 'date-asc'){
-    var sortDate = (a,b) => {return Date.parse(a.released) - Date.parse(b.released)};
-    const currentProductscp = [...currentProducts];
-    var Orderdate = currentProductscp.sort(sortDate);
-    render(Orderdate, currentPagination);
-  }
-  else if(event.target.value == 'date-desc'){
-    var sortDate = (a,b) => {return Date.parse(b.released) - Date.parse(a.released)};
-    const currentProductscp = [...currentProducts];
-    var Orderdate = currentProductscp.sort(sortDate);
-    render(Orderdate, currentPagination);
-  }
   else {
     render(currentProducts, currentPagination);
   }
@@ -284,20 +155,30 @@ function filterByFavorite(usedList){
 
 filterFavorite.onchange = function() {
   if(filterFavorite.checked) {
-    var currentProductscp = currentProducts;
-    if (currentProducts.length == 0){currentProductscp = ProductsSaved;}
-    var currentProductsfav = filterByFavorite(currentProductscp);
+    var currentProductsfav = filterByFavorite(favoriteP);
     render(currentProductsfav, currentPagination);
   } 
   else{
     render(currentProducts, currentPagination);
   }
 };
-
 function OnFavoriteClick(elmt){
   console.log(elmt)
   var uuidFavorite = elmt.id
-  var productFav = ProductsSaved['result'].find(obj => obj.uuid === uuidFavorite);
-  productFav.favorite = !productFav.favorite;
+  var productFav = currentProducts.find(obj => obj._id === uuidFavorite);
+  console.log(productFav)
+  productFav['favorite'] =true
+  var b = true
+  for (let i = 0; i < favoriteP.length; i++){
+    if(favoriteP[i]._id === productFav._id){
+      productFav.favorite = false
+      favoriteP.splice(i, 1)
+      b = false
+      break;
+    }
+  }
+  if(b==true){
+    favoriteP.push(productFav)
+  }
   render(currentProducts, currentPagination);
 }
